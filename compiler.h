@@ -11,6 +11,18 @@ struct pos
     const char *filename;
 };
 
+#define NUMERIC_CASE \
+    case '0':        \
+    case '1':        \
+    case '2':        \
+    case '3':        \
+    case '4':        \
+    case '5':        \
+    case '6':        \
+    case '7':        \
+    case '8':        \
+    case '9'
+
 enum
 {
     LEXICAL_ANALYSIS_ALL_OK,
@@ -33,6 +45,7 @@ struct Token
 {
     int type;
     int flags;
+    struct pos pos;
 
     union
     {
@@ -100,7 +113,8 @@ char compile_process_peek_char(struct lex_process *lex_process);
 void compile_process_push_char(struct lex_process *lex_process, char c);
 
 // compiler
-
+void compiler_error(struct compile_process *compiler, const char *msg, ...);
+void compiler_warning(struct compile_process *compiler, const char *msg, ...);
 struct compile_process *compile_process_create(char *filename, const char *filename_out, int flags);
 
 // lex_process
