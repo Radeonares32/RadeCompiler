@@ -172,11 +172,21 @@ const char *read_op()
 static void lex_new_expression()
 {
     lex_process->current_expression_count++;
-    if(lex_process->current_expression_count == 1)
+    if (lex_process->current_expression_count == 1)
     {
         lex_process->parantheses_buffer = buffer_create();
     }
 }
+
+static void lex_finish_expression()
+{
+    lex_process->current_expression_count--;
+    if (lex_process->current_expression_count < 0)
+    {
+        compiler_error(lex_process->compiler, "You closed an expression that you never opened\n");
+    }
+}
+
 bool lex_is_in_expression()
 {
     return lex_process->current_expression_count > 0;
@@ -196,11 +206,22 @@ static struct Token *token_make_operator_or_string()
 
     struct Token *token = token_create(&(struct Token){.type = TOKEN_TYPE_OPERATOR, .sval = read_op()});
 
-    if(op == '(')
+    if (op == '(')
     {
         lex_new_expression();
     }
 
+    return token;
+}
+
+static struct Token *token_make_symbol()
+{
+    char c = nextc();
+    if (c == ')')
+    {
+        lex_finish_expression();
+    }
+    struct Token *token = token_create(&(struct Token){.type = TOKEN_TYPE_SYMBOL, .cval = c});
     return token;
 }
 
@@ -220,6 +241,9 @@ struct Token *read_next_token()
 
     NUMERIC_CASE:
         token = token_make_number();
+        break;
+    SYMBOL_CASE:
+        token = token_make_symbol();
         break;
 
     OPERATOR_CASE_EXCLUDING_DIVISION:

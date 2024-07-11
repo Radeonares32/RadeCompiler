@@ -5,8 +5,8 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define S_EQ(str,str1) \
-        (str && str1 && (strcmp(str,str1) == 0))
+#define S_EQ(str, str1) \
+    (str && str1 && (strcmp(str, str1) == 0))
 
 struct pos
 {
@@ -27,18 +27,17 @@ struct pos
     case '8':        \
     case '9'
 
-#define NUMERIC_CASES\
-    case '0':        \
-    case '1':        \
-    case '2':        \
-    case '3':        \
-    case '4':        \
-    case '5':        \
-    case '6':        \
-    case '7':        \
-    case '8':        \
+#define NUMERIC_CASES \
+    case '0':         \
+    case '1':         \
+    case '2':         \
+    case '3':         \
+    case '4':         \
+    case '5':         \
+    case '6':         \
+    case '7':         \
+    case '8':         \
     case '9'
-
 
 #define OPERATOR_CASE_EXCLUDING_DIVISION \
     case '+':                            \
@@ -58,6 +57,16 @@ struct pos
     case ',':                            \
     case '.':                            \
     case '?'
+
+#define SYMBOL_CASE \
+    case '{':       \
+    case '}':       \
+    case ':':       \
+    case ';':       \
+    case '#':       \
+    case '\\':      \
+    case ')':       \
+    case ']'
 
 enum
 {
@@ -163,7 +172,7 @@ struct vector *lex_process_tokens(struct lex_process *process);
 // lexer
 int lex(struct lex_process *process);
 
-//token
+// token
 bool token_is_keyword(struct Token *token, const char *value);
 
 #endif
