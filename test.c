@@ -1,1 +1,5 @@
-30 ! 30 40+40 50 != 50 "23" + "23" ++ (50+20) [#] functionasd
+int asd long
+int
+long
+float
+include
