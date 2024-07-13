@@ -210,6 +210,52 @@ bool is_keyword(const char *str) {
          S_EQ(str, "const") || S_EQ(str, "extern") || S_EQ(str, "restrict");
 }
 
+static struct Token *token_make_one_line_comment() {
+  struct buffer *buffer = buffer_create();
+  char c = 0;
+  LEX_GETC_IF(buffer, c, c != '\n' && c != EOF);
+  return token_create(
+      &(struct Token){.type = TOKEN_TYPE_COMMENT, .sval = buffer_ptr(buffer)});
+  ;
+}
+
+struct Token *token_make_multiline_comment() {
+  struct buffer *buffer = buffer_create();
+  char c = 0;
+  while (1) {
+    LEX_GETC_IF(buffer, c, c != '*' && c != EOF);
+    if (c == EOF) {
+      compiler_error(lex_process->compiler,
+                     "You did not close this multiline comment\n");
+    } else if (c == '*') {
+      nextc();
+      if (peekc() == '/') {
+        nextc();
+        break;
+      }
+    }
+  }
+  return token_create(
+      &(struct Token){.type = TOKEN_TYPE_COMMENT, .sval = buffer_ptr(buffer)});
+}
+
+struct Token *handle_comment() {
+  char c = peekc();
+  if (c == '/') {
+    nextc();
+    if (peekc() == '/') {
+      nextc();
+      return token_make_one_line_comment();
+    } else if (peekc() == '*') {
+      nextc();
+      return token_make_multiline_comment();
+    }
+    pushc('/');
+    return token_make_operator_or_string();
+  }
+  return NULL;
+}
+
 static struct Token *token_make_identifier_or_keyword() {
   struct buffer *buffer = buffer_create();
   char c = 0;
@@ -238,14 +284,20 @@ struct Token *read_special_token() {
   return NULL;
 }
 
-struct Token* token_make_newline(){
-    nextc();
-    return token_create(&(struct Token){.type = TOKEN_TYPE_NEWLINE});
+struct Token *token_make_newline() {
+  nextc();
+  return token_create(&(struct Token){.type = TOKEN_TYPE_NEWLINE});
 }
 
 struct Token *read_next_token() {
   struct Token *token = NULL;
   char c = peekc();
+
+  token = handle_comment();
+  if(token){
+      return token;
+  }
+
   switch (c) {
   case '"':
     token = token_make_string('"', '"');
@@ -254,7 +306,7 @@ struct Token *read_next_token() {
   case '\t':
     token = handle_whitespace();
     break;
- case '\n':
+  case '\n':
     token = token_make_newline();
     break;
   NUMERIC_CASE:

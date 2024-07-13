@@ -3,3 +3,8 @@ int
 long
 float
 include
+
+// asdsa
+/*
+asdsad
+*/
