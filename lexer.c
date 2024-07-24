@@ -373,6 +373,52 @@ char lex_get_escaped_char(char c)
   return ce;
 }
 
+void lexer_pop_token()
+{
+  vector_pop(lex_process->token_vec);
+}
+
+bool is_hex_char(char c)
+{
+  c = tolower(c);
+  return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f');
+}
+
+const char *read_hex_number_str()
+{
+  struct buffer *buffer = buffer_create();
+  char c = peekc();
+  LEX_GETC_IF(buffer, c, is_hex_char(c));
+  // write our null terminator
+  buffer_write(buffer, 0x00);
+  return buffer_ptr(buffer);
+}
+
+struct Token *token_make_specail_number_hexdecimal()
+{
+  // Skip the "x"
+  nextc();
+  unsigned long number = 0;
+  const char *number_str = read_hex_number_str();
+  number = strtol(number_str, 0, 16);
+  return token_make_number_for_value(number);
+}
+
+struct Token *token_make_specail_number()
+{
+  struct Token *token = NULL;
+  struct Token *last_token = lexer_last_token();
+  lexer_pop_token();
+
+  char c = peekc();
+
+  if (c == 'x')
+  {
+    token = token_make_specail_number_hexdecimal();
+  }
+  return token;
+}
+
 struct Token *token_make_quote()
 {
   assert_next_char('\'');
@@ -403,6 +449,20 @@ struct Token *read_next_token()
 
   switch (c)
   {
+  NUMERIC_CASE:
+    token = token_make_number();
+    break;
+  OPERATOR_CASE_EXCLUDING_DIVISION:
+    token = token_make_operator_or_string();
+    break;
+  SYMBOL_CASE:
+    token = token_make_symbol();
+    break;
+
+  case 'x':
+    token = token_make_specail_number();
+    break;
+
   case '"':
     token = token_make_string('"', '"');
     break;
@@ -416,16 +476,6 @@ struct Token *read_next_token()
     break;
   case '\n':
     token = token_make_newline();
-    break;
-  NUMERIC_CASE:
-    token = token_make_number();
-    break;
-  SYMBOL_CASE:
-    token = token_make_symbol();
-    break;
-
-  OPERATOR_CASE_EXCLUDING_DIVISION:
-    token = token_make_operator_or_string();
     break;
   case EOF:
     break;
