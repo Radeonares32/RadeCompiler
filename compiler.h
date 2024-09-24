@@ -102,6 +102,8 @@ struct Token
         void *any;
     };
     bool whitespace;
+
+    // (1+2+3)
     const char *between_barackets;
 };
 
