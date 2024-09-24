@@ -45,6 +45,9 @@ int compile_file(char *filename, const char *out_filename, int flags)
     {
         return COMPILER_FAILED_WITH_ERRORS;
     }
+
+    process->token_vec = lex_process->token_vec;
+
     // Perform parsing
 
     // Preform code generation...

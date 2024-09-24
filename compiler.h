@@ -86,7 +86,8 @@ enum
     TOKEN_TYPE_NEWLINE
 };
 
-enum {
+enum
+{
     NUMBER_TYPE_NORMAL,
     NUMBER_TYPE_LOMG,
     NUMBER_TYPE_FLOAT,
@@ -161,6 +162,8 @@ struct compile_process
         const char *abs_path;
     } cfile;
 
+    // A vector of tokens from lexical analysis
+    struct vector *token_vec;
     FILE *ofile;
 };
 
