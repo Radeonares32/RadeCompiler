@@ -404,10 +404,39 @@ struct Token *token_make_specail_number_hexdecimal()
   return token_make_number_for_value(number);
 }
 
+void loexer_validate_binary_string(const char *str)
+{
+  size_t len = strlen(str);
+
+  for (int i = 0; i < len; i++)
+  {
+    if (str[i] != '0' && str[i] != '1')
+    {
+      compiler_error(lex_process->compiler, "This is not a valid binary number\n");
+    }
+  }
+}
+
+struct Token *token_make_specail_number_binary()
+{
+  // Skip "b" ex: 0b000001
+  nextc();
+  unsigned long number = 0;
+  const char *number_str = read_number_str();
+  loexer_validate_binary_string(number_str);
+  number = strtol(number_str, 0, 2);
+  return token_make_number_for_value(number);
+}
+
 struct Token *token_make_specail_number()
 {
   struct Token *token = NULL;
   struct Token *last_token = lexer_last_token();
+  if (!last_token || !(last_token->type == TOKEN_TYPE_NUMBER && last_token->llnum == 0))
+  {
+    return token_make_identifier_or_keyword();
+  }
+
   lexer_pop_token();
 
   char c = peekc();
@@ -415,6 +444,10 @@ struct Token *token_make_specail_number()
   if (c == 'x')
   {
     token = token_make_specail_number_hexdecimal();
+  }
+  else if (c == 'b')
+  {
+    token = token_make_specail_number_binary();
   }
   return token;
 }
@@ -458,7 +491,7 @@ struct Token *read_next_token()
   SYMBOL_CASE:
     token = token_make_symbol();
     break;
-
+  case 'b':
   case 'x':
     token = token_make_specail_number();
     break;
