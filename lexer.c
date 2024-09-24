@@ -49,7 +49,7 @@ struct Token *token_create(struct Token *_token)
 {
   memcpy(&tmp_token, _token, sizeof(struct Token));
   tmp_token.pos = lex_file_position();
-  if(lex_is_in_expression())
+  if (lex_is_in_expression())
   {
     tmp_token.between_barackets = buffer_ptr(lex_process->parantheses_buffer);
   }
@@ -549,4 +549,43 @@ int lex(struct lex_process *process)
   }
 
   return LEXICAL_ANALYSIS_ALL_OK;
+}
+
+char lexer_string_buffer_next_char(struct lex_process *process)
+{
+  struct buffer *buffer = lex_process_private(process);
+  return buffer_read(buffer);
+}
+
+char lexer_string_buffer_peek_char(struct lex_process *process)
+{
+  struct buffer *buffer = lex_process_private(process);
+  return buffer_peek(buffer);
+}
+
+void lexer_string_buffer_push_char(struct lex_process *process, char c)
+{
+  struct buffer *buffer = lex_process_private(process);
+  buffer_write(buffer, c);
+}
+
+struct lex_process_functions lexer_string_buffer_functions = {
+    .next_char = lexer_string_buffer_next_char,
+    .peek_char = lexer_string_buffer_peek_char,
+    .push_char = lexer_string_buffer_push_char};
+
+struct lex_process *token_build_for_string(struct compile_process *compiler, const char *str)
+{
+  struct buffer *buffer = buffer_create();
+  buffer_printf(buffer, str);
+  struct lex_process *lex_process = lex_process_create(compiler, &lexer_string_buffer_functions, buffer);
+  if (!lex_process)
+  {
+    return NULL;
+  }
+  if (lex(lex_process) != LEXICAL_ANALYSIS_ALL_OK)
+  {
+    return NULL;
+  }
+  return lex_process;
 }

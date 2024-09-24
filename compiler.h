@@ -174,6 +174,9 @@ struct vector *lex_process_tokens(struct lex_process *process);
 // lexer
 int lex(struct lex_process *process);
 
+// Builds tokens for the input string.
+struct lex_process *token_build_for_string(struct compile_process *compiler, const char *str);
+
 // token
 bool token_is_keyword(struct Token *token, const char *value);
 
