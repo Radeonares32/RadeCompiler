@@ -89,10 +89,31 @@ static struct Token *handle_whitespace()
   nextc();
   return read_next_token();
 }
+
+int lexer_number_type(char c)
+{
+  int res = NUMBER_TYPE_NORMAL;
+  if (c == 'L')
+  {
+    res = NUMBER_TYPE_LOMG;
+  }
+  else if (c == 'f')
+  {
+    res = NUMBER_TYPE_FLOAT;
+  }
+  return res;
+}
+
 struct Token *token_make_number_for_value(unsigned long number)
 {
+
+  int number_type = lexer_number_type(peekc());
+  if (number_type != NUMBER_TYPE_NORMAL)
+  {
+    nextc();
+  }
   return token_create(
-      &(struct Token){.type = TOKEN_TYPE_NUMBER, .llnum = number});
+      &(struct Token){.type = TOKEN_TYPE_NUMBER, .llnum = number, .num.type = number_type});
 }
 
 struct Token *token_make_number()

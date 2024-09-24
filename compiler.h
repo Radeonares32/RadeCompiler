@@ -86,6 +86,13 @@ enum
     TOKEN_TYPE_NEWLINE
 };
 
+enum {
+    NUMBER_TYPE_NORMAL,
+    NUMBER_TYPE_LOMG,
+    NUMBER_TYPE_FLOAT,
+    NUMBER_TYPE_DOUBLE
+};
+
 struct Token
 {
     int type;
@@ -101,6 +108,12 @@ struct Token
         unsigned long long llnum;
         void *any;
     };
+
+    struct token_number
+    {
+        int type;
+    } num;
+
     bool whitespace;
 
     // (1+2+3)
