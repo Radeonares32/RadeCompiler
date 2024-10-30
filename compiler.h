@@ -168,13 +168,13 @@ struct compile_process
     struct vector *node_vec;
     struct vector *node_tree_vec;
 
-
     FILE *ofile;
 };
 
 int compile_file(char *filename, const char *out_filename, int flags);
 
-enum {
+enum
+{
     PARSE_ALL_OK,
     PARSE_GENERAL_ERROR
 };
@@ -228,16 +228,16 @@ struct node
         // Pointer to the function this node is in.
         struct node *function;
 
-        union
-        {
-            char cval;
-            const char *sval;
-            unsigned int inum;
-            unsigned long lnum;
-            unsigned long long llnum;
-        };
-
     } binded;
+
+    union
+    {
+        char cval;
+        const char *sval;
+        unsigned int inum;
+        unsigned long lnum;
+        unsigned long long llnum;
+    };
 };
 
 // cprocess
@@ -267,7 +267,7 @@ struct lex_process *token_build_for_string(struct compile_process *compiler, con
 // token
 bool token_is_keyword(struct Token *token, const char *value);
 
-//parser
+// parser
 int parse(struct compile_process *process);
 
 #endif
