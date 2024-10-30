@@ -164,10 +164,20 @@ struct compile_process
 
     // A vector of tokens from lexical analysis
     struct vector *token_vec;
+
+    struct vector *node_vec;
+    struct vector *node_tree_vec;
+
+
     FILE *ofile;
 };
 
 int compile_file(char *filename, const char *out_filename, int flags);
+
+enum {
+    PARSE_ALL_OK,
+    PARSE_GENERAL_ERROR
+};
 
 enum
 {
@@ -256,5 +266,8 @@ struct lex_process *token_build_for_string(struct compile_process *compiler, con
 
 // token
 bool token_is_keyword(struct Token *token, const char *value);
+
+//parser
+int parse(struct compile_process *process);
 
 #endif
