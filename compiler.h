@@ -266,8 +266,21 @@ struct lex_process *token_build_for_string(struct compile_process *compiler, con
 
 // token
 bool token_is_keyword(struct Token *token, const char *value);
+bool token_is_nl_or_comment_or_newline_seperator(struct Token *token);
+bool token_is_symbol(struct Token *token, char c);
 
 // parser
 int parse(struct compile_process *process);
+
+//node
+void node_set_vector(struct vector *vec, struct vector *root_vec);
+void node_push(struct node *node);
+struct node *node_peek_or_null();
+bool token_is_symbol(struct Token *token, char c);
+struct node *node_peek();
+struct node *node_pop();
+struct node* node_create(struct node* _node);
+
+bool token_is_nl_or_comment_or_newline_seperator(struct Token *token);
 
 #endif
